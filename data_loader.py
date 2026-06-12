@@ -17,8 +17,8 @@ def load_replay(filepath):
 
     # 校验版本
     version = data.get("version")
-    if version != 1:
-        print(f"错误: 不支持的版本号 {version}，当前仅支持 version 1")
+    if version not in (1, 2):
+        print(f"错误: 不支持的版本号 {version}，当前支持 version 1 和 2")
         sys.exit(1)
 
     # 校验必要字段

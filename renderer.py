@@ -65,7 +65,7 @@ class RaceRenderer:
     def render_frame(self, characters, track_length, positions, terrains=None,
                      rankings=None, skill_lines=None, turn_number=None,
                      total_turns=None, events=None, weather_name=None,
-                     terrain_fair=True):
+                     terrain_fair=True, char_vars=None):
         """
         渲染一帧画面
 
@@ -81,6 +81,7 @@ class RaceRenderer:
             events: 当前回合事件列表 [{action, text, track, effects?}, ...]
             weather_name: 天气名称
             terrain_fair: 是否公平地形
+            char_vars: 角色自定义变量 {track_str: {cannons, steel_plate, ...}}
         """
         num_tracks = len(characters) or 7
         track_h = min(50, self.track_height / num_tracks)
@@ -92,7 +93,7 @@ class RaceRenderer:
 
         # 绘制赛道区域
         self._draw_tracks(draw, characters, track_length, positions, terrains,
-                          rankings, skill_lines, num_tracks, track_h)
+                          rankings, skill_lines, num_tracks, track_h, char_vars)
 
         # 绘制顶部信息栏
         self._draw_info_bar(draw, track_length, turn_number, total_turns,
@@ -105,7 +106,7 @@ class RaceRenderer:
         return img
 
     def _draw_tracks(self, draw, characters, track_length, positions, terrains,
-                     rankings, skill_lines, num_tracks, track_h):
+                     rankings, skill_lines, num_tracks, track_h, char_vars=None):
         """绘制赛道区域"""
         colors = COLORS
         track_span = self.width - self.margin - self.right_margin
@@ -136,6 +137,17 @@ class RaceRenderer:
             if terrains:
                 self._draw_terrains(draw, terrains, i + 1, track_length, y, track_h, track_span)
 
+            # 浮游炮渲染（乌拉拉角色ID 17）
+            if char_vars:
+                for track_key, vars in char_vars.items():
+                    cannons = vars.get("cannons", [])
+                    for cannon in cannons:
+                        if cannon.get("track") == i + 1:
+                            c_progress = (track_length - cannon["pos"]) / (track_length - 1)
+                            cx = self.margin + c_progress * track_span
+                            cy = y + track_h / 2
+                            self._draw_emoji(draw, "🔫", cx, cy - 10, 14)
+
             # 角色渲染
             char_data = characters[i] if i < len(characters) else None
             pos = positions[i] if i < len(positions) else track_length
@@ -146,6 +158,13 @@ class RaceRenderer:
             # 角色 emoji
             icon = char_data["icon"] if char_data else "🏃"
             self._draw_emoji(draw, icon, char_x, char_y, 22)
+
+            # 钢板装甲状态（乌拉拉角色ID 17）
+            if char_vars:
+                track_key = str(i + 1)
+                vars = char_vars.get(track_key, {})
+                if vars.get("steel_plate", 0) > 0:
+                    self._draw_emoji(draw, "🛡️", char_x + 14, char_y - 12, 12)
 
             # 奖牌
             if rankings:
@@ -220,8 +239,12 @@ class RaceRenderer:
             from_progress = (track_length - from_pos) / (track_length - 1)
             from_x = self.margin + from_progress * track_span
 
-            line_color = _hex_to_rgb(COLORS["skill_debuff"] if line["type"] == "debuff"
-                                      else COLORS["skill_buff"])
+            line_color = _hex_to_rgb(
+                COLORS["skill_debuff"] if line["type"] == "debuff"
+                else COLORS["skill_reflect"] if line["type"] == "reflect"
+                else COLORS["skill_deploy"] if line["type"] == "deploy"
+                else COLORS["skill_buff"]
+            )
             line_width = 3  # 增大线宽
 
             if line.get("isSelf") and line["type"] == "buff":

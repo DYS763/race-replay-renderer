@@ -6,6 +6,8 @@ from race_data import WEATHER_CONFIG
 # 技能效果中的减益类型（用于判断连线颜色）
 DEBUFF_TYPES = {"backward", "pause", "silence", "prob_backward", "var_backward", "mark_target"}
 BUFF_TYPES = {"forward", "prob_forward", "var_forward", "increment_var", "ub"}
+REFLECT_TYPES = {"steel_plate_reflect"}
+DEPLOY_TYPES = {"cannon_deploy"}
 
 
 def _ease_in_out_cubic(t):
@@ -34,6 +36,10 @@ def _build_skill_lines(events):
                 line_type = "debuff"
             elif effect_type in BUFF_TYPES:
                 line_type = "buff"
+            elif effect_type in REFLECT_TYPES:
+                line_type = "reflect"
+            elif effect_type in DEPLOY_TYPES:
+                line_type = "deploy"
             if line_type:
                 lines.append({
                     "from": source_track,
@@ -109,6 +115,7 @@ def generate_frames(replay_data, speed=1.0, fps=15, max_turns=None, show_log=Tru
         total_turns=total_turns,
         events=None,
         terrain_fair=terrain_fair,
+        char_vars=None,
     )
     _progress()
     # 初始帧多停留一会
@@ -124,6 +131,7 @@ def generate_frames(replay_data, speed=1.0, fps=15, max_turns=None, show_log=Tru
             total_turns=total_turns,
             events=None,
             terrain_fair=terrain_fair,
+            char_vars=None,
         )
         _progress()
 
@@ -136,6 +144,7 @@ def generate_frames(replay_data, speed=1.0, fps=15, max_turns=None, show_log=Tru
         turn_terrains = turn.get("terrains", terrains)
         events = turn.get("events", [])
         rankings = turn.get("rankings")
+        char_vars = turn.get("char_vars")
         skill_lines = _build_skill_lines(events)
 
         # 1) 平滑移动帧
@@ -161,6 +170,7 @@ def generate_frames(replay_data, speed=1.0, fps=15, max_turns=None, show_log=Tru
                 total_turns=total_turns,
                 events=events if (show_log and t > 0.3) else None,
                 terrain_fair=terrain_fair,
+                char_vars=char_vars,
             )
             _progress()
 
@@ -177,6 +187,7 @@ def generate_frames(replay_data, speed=1.0, fps=15, max_turns=None, show_log=Tru
                 total_turns=total_turns,
                 events=events if show_log else None,
                 terrain_fair=terrain_fair,
+                char_vars=char_vars,
             )
             _progress()
 
@@ -214,5 +225,6 @@ def generate_frames(replay_data, speed=1.0, fps=15, max_turns=None, show_log=Tru
             total_turns=total_turns,
             events=finish_events if show_log else None,
             terrain_fair=terrain_fair,
+            char_vars=None,
         )
         _progress()

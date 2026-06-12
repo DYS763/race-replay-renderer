@@ -18,6 +18,7 @@ CHARACTERS = {
     14: {"name": "鹿头",      "icon": "🦌"},
     15: {"name": "雪绘",      "icon": "❄️"},
     16: {"name": "胡桃",      "icon": "✝️"},
+    17: {"name": "乌拉拉",    "icon": "🍆"},
 }
 
 # 9种地形 {type: {color, name, desc}}
@@ -61,6 +62,8 @@ COLORS = {
     "border_light":  "#444466",   # 格点颜色
     "skill_buff":    "#448aff",   # 增益技能线
     "skill_debuff":  "#ff5252",   # 减益技能线
+    "skill_reflect": "#ab47bc",   # 钢板反弹连线（紫色）
+    "skill_deploy":  "#ff9800",   # 浮游炮部署连线（橙色）
     "log_move":      "#a0a0a0",   # 移动日志颜色
     "log_skill":     "#ffd54f",   # 技能日志颜色
     "log_weather":   "#4fc3f7",   # 天气日志颜色
