@@ -166,6 +166,13 @@ class RaceRenderer:
                 if vars.get("steel_plate", 0) > 0:
                     self._draw_emoji(draw, "🛡️", char_x + 14, char_y - 12, 12)
 
+            # YSN义父关系标记（角色ID 18）
+            if char_vars:
+                track_key = str(i + 1)
+                vars = char_vars.get(track_key, {})
+                if vars.get("godfather"):
+                    self._draw_emoji(draw, "👨", char_x - 14, char_y - 12, 12)
+
             # 奖牌
             if rankings:
                 rank_info = next((r for r in rankings if r["track"] == i + 1), None)

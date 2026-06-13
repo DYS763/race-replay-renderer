@@ -19,6 +19,7 @@ CHARACTERS = {
     15: {"name": "雪绘",      "icon": "❄️"},
     16: {"name": "胡桃",      "icon": "✝️"},
     17: {"name": "乌拉拉",    "icon": "🍆"},
+    18: {"name": "YSN",       "icon": "⚔️"},
 }
 
 # 9种地形 {type: {color, name, desc}}
